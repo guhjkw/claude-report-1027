@@ -1,0 +1,47 @@
+
+1. The studio loads on the small claims record
+  PASS stage Mediation, next date November 20 in 24 days
+  PASS 31 of 31 figures traced, reading grade 6.5, 8 of 8 checks
+  PASS Claude cost per report about 3 cents
+  PASS the user sees what happens next with countdowns
+  PASS and a glossary of the legal words used
+
+2. Changing the internal data changes the report
+  PASS moving the trial to December 15 updates the report and its countdown (49 days)
+  PASS and it still passes every check
+  PASS an impossible date is flagged on the row and listed, not silently used
+  PASS the mediation deadline it carried drops out, so the trial is next
+  PASS putting both back restores November 20
+
+3. Adding a docket entry
+  PASS an entry with no text is refused with a reason
+  PASS an entry dated after the report date is refused
+  PASS a continuance order puts the trial on January 12, 2027
+  PASS and the old December 8 date is no longer shown as upcoming
+  PASS removing the entry takes it back out
+
+4. Editing Claude's output: the checks catch it
+  PASS the user sees the blocked notice instead of the report
+  PASS the checks drop to 7 of 8
+  PASS 'Back to the model's output' restores 8 of 8
+  PASS "you will win" is blocked as legal advice
+  PASS broken JSON is refused with the parser error
+
+5. Reader, report date and the probate record
+  PASS the staff version shows docket codes and drops the glossary
+  PASS on November 21 the deadline has passed: trial next in 17 days
+  PASS the probate record: stage Claims, no dates ahead, two problems listed
+  PASS fixing September 31 brings back the hearing on November 5 at 10:00 AM
+
+6. The request, downloads, reset
+  PASS the request shown uses claude-opus-5-5, server-side fallback and a JSON schema
+  PASS it carries the docket ids Claude must cite
+  PASS the report downloads as a standalone page
+  PASS a report that fails a check is not exported
+  PASS reset brings back the starting records
+
+7. Phone layout
+  PASS no sideways scrolling at 390px wide
+  PASS zero console or page errors
+
+31 browser checks: 31 passed, 0 failed

@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Case Report Studio · live demo</title>
+<meta name="description" content="Live demo: Claude turns internal court-record data into a plain-English report end users can act on, and every date, time, amount and name is traced back to the record before anyone sees it. Invented records, real working logic, the exact Claude request shown.">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#070b12;--s1:#0d141f;--s2:#121b28;--s3:#192333;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);
+  --text:#eef3fa;--muted:#a9b6c8;--faint:#718099;
+  --acc:#2dd4bf;--acc2:#99f6e4;--accInk:#032420;--accSoft:rgba(45,212,191,.12);--accLine:rgba(45,212,191,.42);
+  --gold:#e7b84a;--goldSoft:rgba(231,184,74,.12);
+  --r:20px;--r2:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --a-bg:#f4f6f9;--a-panel:#fff;--a-line:#e2e6ed;--a-line2:#cfd6e1;--a-text:#14213d;--a-muted:#5b6578;--a-side:#14213d;--a-sideText:#c5cfe0;
+  --a-acc:#0f766e;--a-accSoft:#e6f6f3;--maroon:#8c1d40;--maroonSoft:#fbe9ef;
+  --c-ok:#047857;--c-okBg:#e2f5ec;--c-warn:#9a6700;--c-warnBg:#fdf3d6;--c-bad:#b42318;--c-badBg:#fde8e6;--c-info:#1d4ed8;--c-infoBg:#e7eefc;--c-grey:#4b5563;--c-greyBg:#eef0f3;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1360px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:2px;border-radius:6px}
+section[id]{scroll-margin-top:76px}
+.ribbon{background:linear-gradient(90deg,#08241f,#070b12 35%,#070b12 65%,#08241f);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ribbon .wrap{display:flex;gap:10px;align-items:center;justify-content:center;padding-top:9px;padding-bottom:9px;flex-wrap:wrap;text-align:center}
+.ribbon b{color:var(--text)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--accSoft);display:inline-block}
+header.nav{position:sticky;top:0;z-index:40;background:rgba(7,11,18,.86);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#99f6e4,#14b8a6 60%,#0f4f47);display:grid;place-items:center;color:#06142b;font:800 15px var(--serif)}
+.wm{font-weight:760;letter-spacing:-.015em;font-size:17px;line-height:1}
+.wm small{display:block;font-size:10px;letter-spacing:.22em;color:var(--faint);font-weight:650;margin-top:5px}
+.links{display:flex;gap:22px;font-size:14.5px;color:var(--muted)}
+.links a{text-decoration:none}.links a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:10px 16px;font-weight:700;font-size:14.5px;border:1px solid var(--line2);background:var(--s2);text-decoration:none;white-space:nowrap}
+.btn.pri{background:linear-gradient(180deg,var(--acc2),var(--acc));color:var(--accInk);border-color:transparent}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.hero{position:relative;padding:38px 0 8px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:-30% -10% auto -10%;height:700px;background:radial-gradient(600px 340px at 12% 20%,rgba(45,212,191,.13),transparent 70%),radial-gradient(520px 320px at 92% 0%,rgba(231,184,74,.07),transparent 70%);pointer-events:none}
+.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:end}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--accSoft);color:var(--acc2);font-size:13px;font-weight:650;border:1px solid var(--accLine)}
+h1{font:600 clamp(30px,4vw,50px)/1.07 var(--serif);letter-spacing:-.02em;margin:14px 0 12px}
+h1 .hl{background:linear-gradient(100deg,var(--acc2),var(--acc) 55%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:17px;color:var(--muted);max-width:690px;margin:0}
+.lede b{color:var(--text);font-weight:650}
+.benefits{display:grid;gap:10px}
+.ben{display:flex;gap:13px;align-items:flex-start;padding:13px 15px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line)}
+.ben i{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--accSoft);color:var(--acc);font-style:normal;font-size:15px;font-weight:800}
+.ben b{display:block;font-size:15px}
+.ben span{color:var(--muted);font-size:13.5px;line-height:1.45}
+.trybreak{margin:18px 0 0;font-size:14px;color:var(--muted)}
+.trybreak b{color:var(--acc2)}
+
+/* ---------- the app window (light, a faculty studio) ---------- */
+.app{margin:18px 0 0;border-radius:18px;overflow:hidden;border:1px solid var(--line2);box-shadow:0 50px 110px -50px rgba(0,0,0,.95),0 0 0 6px #0b1220;background:var(--a-bg);color:var(--a-text);color-scheme:light}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#e9edf3;border-bottom:1px solid var(--a-line2);flex-wrap:wrap}
+.lights{display:flex;gap:6px}.lights i{width:11px;height:11px;border-radius:50%;background:#c9d0db}
+.atitle{font-weight:750;font-size:13.5px;color:#22304d}
+.atitle small{color:#7a8496;font-weight:600;margin-left:6px}
+.abar .sp{flex:1}
+.abtn{border:1px solid var(--a-line2);background:#fff;color:var(--a-text);border-radius:9px;padding:6px 11px;font-size:13px;font-weight:650;line-height:1.3}
+.abtn:hover{border-color:#aab4c4}
+.abtn.pri{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
+.abtn.ok{background:var(--c-ok);border-color:var(--c-ok);color:#fff}
+.abtn.ghost{background:transparent}
+.abtn[disabled]{opacity:.45;cursor:not-allowed}
+.abody{display:grid;grid-template-columns:210px minmax(0,1fr)}
+.side{background:var(--a-side);color:var(--a-sideText);padding:14px 10px;display:flex;flex-direction:column;gap:3px}
+.side .co{color:#fff;font-weight:700;font-size:13.5px;padding:4px 8px 12px;line-height:1.3;font-family:var(--serif)}
+.side .co small{display:block;color:#8e9ab0;font-weight:550;font-size:11.5px;margin-top:3px;font-family:var(--sans)}
+.side button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;font-size:13.5px;font-weight:600}
+.side button:hover{background:rgba(255,255,255,.06);color:#fff}
+.side button[aria-selected="true"]{background:rgba(255,255,255,.11);color:#fff}
+.side button:focus-visible{outline:2px solid #b0d0ff}
+.side .cnt{font:650 11.5px var(--mono);background:rgba(255,255,255,.1);padding:1px 7px;border-radius:999px}
+.side .cnt.bad{background:#7f1d1d;color:#fecaca}
+.side .cnt.ok{background:#064e3b;color:#a7f3d0}
+.side .sep{height:1px;background:rgba(255,255,255,.08);margin:10px 4px}
+.side .note{font-size:11.5px;color:#8e9ab0;padding:4px 8px;line-height:1.45}
+.main{min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:#fff;border-bottom:1px solid var(--a-line)}
+.kpi{padding:11px 14px;border-right:1px solid var(--a-line)}
+.kpi:last-child{border-right:0}
+.kpi b{display:block;font:760 21px/1.15 var(--mono);letter-spacing:-.02em}
+.kpi span{display:block;font-size:11.5px;color:var(--a-muted);font-weight:600;margin-top:2px;line-height:1.3}
+.kpi.flash b{animation:flash 1s ease}
+@keyframes flash{0%{color:var(--a-acc)}100%{color:inherit}}
+.cols{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:600px}
+.left{border-right:1px solid var(--a-line);background:#fafbfc;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.right{padding:14px 16px;min-width:0}
+.card{background:#fff;border:1px solid var(--a-line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 8px;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:#5b6578}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--a-muted);font-weight:600}
+.field input,.field select,.field textarea,.ta{border:1px solid var(--a-line2);border-radius:8px;padding:6px 8px;background:#fff;color:var(--a-text);font-size:13.5px;min-width:0;width:100%}
+.ta{font:13px/1.5 var(--sans);resize:vertical}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--a-text);font-weight:600}
+.err{color:var(--c-bad);font-size:12.5px;font-weight:600;margin-top:6px}
+.err:empty{display:none}
+.hint{color:var(--a-muted);font-size:12px;margin-top:6px;line-height:1.45}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.chip.ok{background:var(--c-okBg);color:var(--c-ok)}
+.chip.warn{background:var(--c-warnBg);color:var(--c-warn)}
+.chip.bad{background:var(--c-badBg);color:var(--c-bad)}
+.chip.info{background:var(--c-infoBg);color:var(--c-info)}
+.chip.grey{background:var(--c-greyBg);color:var(--c-grey)}
+.chip.mar{background:var(--maroonSoft);color:var(--maroon)}
+.chip button{all:unset;cursor:pointer;font-weight:800;padding:0 2px}
+/* ---------- page sections ---------- */
+.sec{padding:64px 0 0}
+.sec h2.big{font:600 clamp(26px,3vw,38px)/1.12 var(--serif);letter-spacing:-.015em;margin:0 0 10px}
+.sec p.sub{color:var(--muted);max-width:780px;margin:0 0 26px;font-size:16.5px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.step{padding:18px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line)}
+.step .n{font:800 13px var(--mono);color:var(--acc)}
+.step b{display:block;margin:6px 0 4px;font-size:16px}
+.step span{color:var(--muted);font-size:14px}
+.step.you{border-color:var(--accLine);background:linear-gradient(180deg,rgba(45,212,191,.08),var(--s1))}
+.arch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:stretch}
+.box{padding:14px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line);font-size:13.5px;color:var(--muted);position:relative}
+.box b{display:block;color:var(--text);font-size:14.5px;margin-bottom:4px}
+.box .tier{display:inline-block;margin-top:8px;font:700 11px var(--mono);padding:2px 7px;border-radius:999px;background:var(--accSoft);color:var(--acc2)}
+.box.you{border-color:var(--accLine)}
+.why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.why div{padding:14px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1);font-size:14px;color:var(--muted)}
+.why b{color:var(--text);display:block;margin-bottom:3px}
+.hood{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+pre.tree{margin:0;padding:16px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line);font:13px/1.6 var(--mono);color:#cbd8ea;overflow:auto}
+.hood p{color:var(--muted);margin:0 0 12px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.tierc{position:relative;display:flex;flex-direction:column;padding:22px;border-radius:var(--r);background:var(--s1);border:1px solid var(--line2)}
+.tierc.feat{border:1px solid rgba(231,184,74,.6);background:linear-gradient(180deg,rgba(231,184,74,.09),var(--s1) 40%);box-shadow:0 30px 80px -40px rgba(231,184,74,.35)}
+.badge{position:absolute;top:-12px;left:22px;background:var(--gold);color:#2a1d00;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.02em}
+.tierc h3{margin:0;font-size:18px}
+.price{font:800 34px/1.1 var(--mono);letter-spacing:-.03em;margin:10px 0 2px}
+.price s{font-size:16px;color:var(--faint);font-weight:600;margin-left:8px}
+.tierc .for{color:var(--muted);font-size:14px;margin:0 0 12px}
+.tierc ul{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:14px}
+.tierc li{display:flex;gap:8px}
+.tierc li:before{content:"✓";color:var(--acc);font-weight:900}
+.tierc.feat li:before{color:var(--gold)}
+.tierc li.bonus:before{content:"+";color:var(--gold)}
+.ms{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.ms b{color:var(--text)}
+.phases{margin-top:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.phases div{padding:14px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1);font-size:13.5px;color:var(--muted)}
+.phases b{display:block;color:var(--text)}
+.phases .p{display:block;font:800 18px var(--mono);color:var(--text);margin:4px 0}
+.cta{margin:56px 0 0;padding:30px;border-radius:24px;border:1px solid var(--accLine);background:radial-gradient(500px 220px at 15% 0%,rgba(45,212,191,.14),transparent 70%),var(--s1);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:26px;align-items:center}
+.cta h2{margin:0 0 8px;font:600 clamp(24px,2.6vw,32px)/1.15 var(--serif)}
+.cta p{margin:0;color:var(--muted)}
+.cta .urg{margin-top:10px;font-size:14px;color:var(--acc2)}
+.need{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.need li{padding:10px 12px;border-radius:12px;background:var(--s2);border:1px solid var(--line);font-size:14px}
+.need li b{color:var(--acc2);font-family:var(--mono);margin-right:6px}
+.scope{margin:56px 0 0;padding:22px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1);color:var(--muted);font-size:14px}
+.scope h3{margin:0 0 8px;color:var(--text);font-size:15px}
+.scope ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+footer{padding:36px 0 50px;color:var(--faint);font-size:13.5px;text-align:center}
+@media (max-width:1180px){
+  .hero .wrap{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(3){border-right:0}
+  .kpi:nth-child(-n+3){border-bottom:1px solid var(--a-line)}
+  .cols{grid-template-columns:1fr}
+  .left{border-right:0;border-bottom:1px solid var(--a-line)}
+  .steps,.arch,.phases{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiers,.why{grid-template-columns:1fr}
+  .cta,.hood{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  .links{display:none}
+  .abody{grid-template-columns:1fr}
+  .side{flex-direction:row;flex-wrap:wrap;gap:4px;padding:8px}
+  .side .co,.side .sep,.side .note{display:none}
+  .side button{padding:6px 9px;font-size:12.5px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{border-right:1px solid var(--a-line)!important;border-bottom:1px solid var(--a-line)}
+  .kpi:nth-child(2n){border-right:0!important}
+  .slides,.case,.export{grid-template-columns:1fr}
+  .steps,.arch,.phases{grid-template-columns:1fr}
+  .abar .atitle small{display:none}
+  .nav .wrap{height:56px}
+  .wm{font-size:15px}
+  .wm small{display:none}
+  .nav .btn.sm{padding:6px 10px;font-size:12.5px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* ---------- report studio ---------- */
+.dkr{display:grid;grid-template-columns:28px 112px minmax(0,1fr) 22px;grid-template-areas:"id date code x" "id text text text";gap:4px 6px;padding:7px 8px;border-bottom:1px solid var(--a-line);align-items:center}
+.dkr:last-child{border-bottom:0}
+.dkr.bad{background:#fff6f5}
+.dkr .id{grid-area:id;font:700 11.5px var(--mono);color:var(--a-acc);align-self:start;padding-top:5px}
+.dkr .d{grid-area:date}.dkr .c{grid-area:code}.dkr .t{grid-area:text}
+.dkr .x{grid-area:x;all:unset;cursor:pointer;color:#9aa3b2;font-weight:800;text-align:center}
+.dkr .x:hover{color:var(--c-bad)}
+.dkr input{border:1px solid var(--a-line2);border-radius:6px;padding:3px 6px;font-size:12px;width:100%;min-width:0;background:#fff}
+.dkr .t{font-family:var(--mono);font-size:11.5px}
+.dk{width:100%;border-collapse:collapse;font-size:12.5px}
+.dk td{padding:4px 4px;border-bottom:1px solid var(--a-line);vertical-align:top}
+.dk input,.dk select{border:1px solid var(--a-line2);border-radius:6px;padding:3px 5px;font-size:12px;width:100%;min-width:0;background:#fff}
+.dk td.id{font:700 11.5px var(--mono);color:var(--a-acc);white-space:nowrap;padding-top:8px}
+.dk td.x button{all:unset;cursor:pointer;color:#9aa3b2;font-weight:800;padding:4px 6px}
+.dk td.x button:hover{color:var(--c-bad)}
+.dk tr.bad td{background:#fff6f5}
+.dkwrap{max-height:360px;overflow:auto;border:1px solid var(--a-line);border-radius:10px;background:#fff}
+.addrow{display:grid;grid-template-columns:118px 112px minmax(0,1fr) auto;gap:6px;margin-top:8px}
+.addrow input,.addrow select{border:1px solid var(--a-line2);border-radius:7px;padding:5px 6px;font-size:12.5px;min-width:0;background:#fff}
+.probs{font-size:12px;color:#7a1b12;display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.probs div{background:#fdecea;border-radius:7px;padding:5px 7px}
+.tabsx{display:flex;gap:4px;border-bottom:1px solid var(--a-line2);margin:-2px 0 12px;flex-wrap:wrap}
+.tabsx button{border:0;background:transparent;padding:8px 10px;font-size:13px;font-weight:700;color:var(--a-muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabsx button[aria-selected="true"]{color:var(--a-text);border-bottom-color:var(--a-acc)}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.ck{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
+.ck.ok{background:var(--c-okBg);color:var(--c-ok)}
+.ck.bad{background:var(--c-badBg);color:var(--c-bad)}
+.ck.warn{background:var(--c-warnBg);color:var(--c-warn)}
+.blocked{border:1px solid #f3b4ad;background:#fff7f6;border-radius:12px;padding:14px 16px;color:#7a1b12;font-size:13.5px}
+.blocked b{display:block;font-size:14.5px;margin-bottom:6px;color:#b42318}
+.rep{background:#fff;border:1px solid var(--a-line);border-radius:14px;padding:22px 24px;color:#17233b;max-width:760px}
+.rep-court{font-size:12px;color:#6b7383;font-weight:600}
+.rep h3{font:600 23px/1.2 var(--serif);margin:4px 0 8px}
+.pill{display:inline-block;background:var(--a-accSoft);color:var(--a-acc);font-weight:800;font-size:12px;padding:3px 10px;border-radius:999px}
+.rep-sum{font-size:15.5px;line-height:1.6;margin:14px 0 6px}
+.rep h4{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#5b6578;margin:18px 0 8px}
+.nexts{display:grid;gap:8px}
+.nx{display:grid;grid-template-columns:150px minmax(0,1fr);gap:12px;border:1px solid var(--a-line);border-radius:10px;padding:10px 12px;align-items:center}
+.nx-d{font:750 14px var(--mono);color:var(--a-acc)}
+.nx-d small{display:block;font-size:12px;color:#5b6578}
+.nx b{display:block;font-size:14.5px}
+.nx span{display:inline-block;font-size:12.5px;color:#5b6578;margin-right:10px}
+.nx .cd{color:#0f766e;font-weight:800}
+.acts{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.tl{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13.5px;border-left:2px solid var(--a-line2);padding-left:12px}
+.tl-d{display:inline-block;min-width:150px;font:650 12.5px var(--mono);color:#5b6578}
+.gls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gl{border:1px solid var(--a-line);border-radius:9px;padding:8px 10px;font-size:13px}
+.gl b{display:block;text-transform:capitalize}
+.gl span{color:#4b5563}
+.cav{font-size:12px;color:#6b7383;border-top:1px solid var(--a-line);margin-top:18px;padding-top:10px}
+pre.code{margin:0;background:#0f1724;color:#d6e2f2;border-radius:10px;padding:12px 14px;font:12px/1.55 var(--mono);overflow:auto;max-height:430px;white-space:pre}
+.jsonta{font:12px/1.5 var(--mono);min-height:420px;white-space:pre;resize:vertical}
+.cost{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.cost div{border:1px solid var(--a-line);border-radius:10px;padding:8px 10px;background:#fff}
+.cost b{display:block;font:750 18px var(--mono)}
+.cost span{font-size:11.5px;color:var(--a-muted);font-weight:600}
+.ilist{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.ilist div{font-size:12.5px;padding:6px 8px;border-radius:8px;line-height:1.4}
+.ilist .block{background:var(--c-badBg);color:#7a1b12}
+.ilist .warn{background:var(--c-warnBg);color:#6b4a00}
+@media (max-width:760px){.addrow{grid-template-columns:1fr 1fr}.nx{grid-template-columns:1fr}.gls,.cost{grid-template-columns:1fr}.tl-d{display:block}}
+</style>
+</head>
+<body>
+<div class="ribbon"><div class="wrap"><span class="dot"></span><span><b>Live tool with invented court records.</b> Built from your job post: connect Claude to a report that combines internal data, structure the output, and make it easy to understand and act on.</span></div></div>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top"><span class="logo">C</span><span class="wm">Case Report Studio<small>CLAUDE · YOUR DATA · END USERS</small></span></a>
+  <nav class="links"><a href="#tool">Try it</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#start">Start</a></nav>
+  <a class="btn pri sm" href="#start">Run it on my data</a>
+</div></header>
+
+<main id="top">
+<section class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">Claude, connected to your report</span>
+    <h1>Raw records in. <span class="hl">A report your users understand and act on</span> out.</h1>
+    <p class="lede">This is a <b>live tool, not a video</b>. It takes an internal record (a court docket here), has Claude write a <b>structured report</b> in plain English, and checks every date, time, amount and name against the record <b>before an end user sees it</b>. Change the data or Claude's output and watch the report and the checks change.</p>
+  </div>
+  <div class="benefits">
+    <div class="ben"><i>1</i><div><b>Plain English, measured</b><span>Reading level is scored on every report, and every legal term used gets a one-line meaning.</span></div></div>
+    <div class="ben"><i>2</i><div><b>Nothing invented reaches a user</b><span>A date, amount or name the record does not contain blocks the report, and users get the plain record view instead.</span></div></div>
+    <div class="ben"><i>3</i><div><b>Actionable, not just readable</b><span>What happens next with countdowns, and what the reader can do, each tied to the entry it comes from.</span></div></div>
+  </div>
+</div></section>
+
+<section id="tool"><div class="wrap">
+  <p class="trybreak">Try to break it: <b>change the trial date</b> in the docket, <b>type $5,000 into Claude's output</b>, add <b>"You will win"</b> to an action, or open the probate case and <b>fix the impossible September 31 date</b> to bring back the hearing it hides.</p>
+  <div class="app" id="app">
+    <div class="abar">
+      <div class="lights"><i></i><i></i><i></i></div>
+      <div class="atitle">Case Report Studio <small id="caseName"></small></div>
+      <div class="sp"></div>
+      <button class="abtn" id="dlHtml" type="button">Download report (.html)</button>
+      <button class="abtn" id="dlJson" type="button">Download JSON</button>
+      <button class="abtn" id="resetBtn" type="button">Reset</button>
+    </div>
+    <div class="abody">
+      <nav class="side" role="tablist" aria-label="Records">
+        <div class="co">Internal records<small>invented sample data</small></div>
+        <div id="recList" style="display:flex;flex-direction:column;gap:3px"></div>
+        <div class="sep"></div>
+        <div class="note">In this demo a stand-in drafter on the page writes the same JSON Claude returns, so the page needs no key. The checks are the ones your build runs on every Claude reply.</div>
+      </nav>
+      <div class="main">
+        <div class="kpis" id="kpis">
+          <div class="kpi" data-k="stage"><b>–</b><span>Stage</span></div>
+          <div class="kpi" data-k="next"><b>–</b><span>Next date</span></div>
+          <div class="kpi" data-k="traced"><b>–</b><span>Figures traced to the record</span></div>
+          <div class="kpi" data-k="grade"><b>–</b><span>Reading grade</span></div>
+          <div class="kpi" data-k="checks"><b>–</b><span>Checks passed</span></div>
+          <div class="kpi" data-k="cost"><b>–</b><span>Claude cost per report</span></div>
+        </div>
+        <div class="cols">
+          <aside class="left">
+            <div class="card">
+              <h3>Report settings</h3>
+              <div class="grid2">
+                <label class="field">Report date<input type="date" id="asOf"></label>
+                <label class="field">Reader<select id="aud"><option value="public">The public</option><option value="staff">Records staff</option></select></label>
+              </div>
+              <div class="err" id="setErr" role="alert"></div>
+            </div>
+            <div class="card">
+              <h3>Docket (internal data)</h3>
+              <div class="dkwrap" id="dk"></div>
+              <form class="addrow" id="addForm" novalidate>
+                <input type="date" id="nDate" aria-label="New entry date">
+                <select id="nCode" aria-label="New entry code"></select>
+                <input id="nText" placeholder="Entry text, e.g. ORDER CONTINUING TRIAL SET 01/12/2027 13:30 CTRM 3B" aria-label="New entry text">
+                <button class="abtn pri" type="submit" id="nAdd">Add</button>
+              </form>
+              <div class="err" id="addErr" role="alert"></div>
+              <div class="probs" id="probs"></div>
+            </div>
+          </aside>
+          <div class="right">
+            <div class="tabsx" role="tablist" aria-label="Report views">
+              <button role="tab" type="button" data-v="report" aria-selected="true">What the user sees</button>
+              <button role="tab" type="button" data-v="json" aria-selected="false">Claude's output (JSON)</button>
+              <button role="tab" type="button" data-v="request" aria-selected="false">The Claude request</button>
+              <button role="tab" type="button" data-v="checks" aria-selected="false">Checks <span id="ckCount"></span></button>
+            </div>
+            <div class="checks" id="badges"></div>
+            <div data-view="report"><div id="report"></div></div>
+            <div data-view="json" hidden>
+              <div class="row" style="margin-bottom:8px"><span class="hint" style="margin:0">Edit Claude's reply as if the model got something wrong; the checks and the report update as you type.</span><span class="sp" style="flex:1"></span><button class="abtn" id="resetJson" type="button">Back to the model's output</button></div>
+              <textarea class="ta jsonta" id="jsonTa" spellcheck="false" aria-label="Claude's JSON output"></textarea>
+              <div class="err" id="jsonErr" role="alert"></div>
+            </div>
+            <div data-view="request" hidden>
+              <div class="cost" id="costBox"></div>
+              <pre class="code" id="code"></pre>
+            </div>
+            <div data-view="checks" hidden><div id="checkList"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="how"><div class="wrap">
+  <h2 class="big">How it works</h2>
+  <p class="sub">Claude writes the words. Your data and the checks decide what is true.</p>
+  <div class="steps">
+    <div class="step you"><span class="n">01 · you</span><b>Your internal data</b><span>Read-only access to the tables or API behind your report. Nothing is copied that the report does not need.</span></div>
+    <div class="step"><span class="n">02</span><b>Facts first</b><span>Code works out the stage, dates, countdowns and amounts. Claude never has to calculate, so it cannot miscount.</span></div>
+    <div class="step"><span class="n">03</span><b>Claude writes to a schema</b><span>Structured output: headline, summary, what happens next, actions, timeline, glossary. Same shape every time, so your page can render it.</span></div>
+    <div class="step"><span class="n">04</span><b>Checked, then shown</b><span>Every figure and name traced, reading level scored, advice phrasing blocked. A failed check shows the plain record view and logs it.</span></div>
+  </div>
+</div></section>
+
+<section class="sec" id="hood"><div class="wrap">
+  <h2 class="big">Under the hood</h2>
+  <div class="hood">
+    <pre class="tree">claude-report-1027/
+├─ index.html          the studio you just used
+├─ src/caseReport.js   facts, draft, checks, request, render
+├─ data/records.json   two invented court records
+└─ tests/
+   ├─ verify.js        <span id="nodeCount">61</span> engine checks
+   └─ browser-check.py clicks through this page</pre>
+    <div>
+      <p>The page and the tests load the same engine file. The tests also prove the drafted report fits the exact JSON schema the Claude request sends, and that every kind of mistake a model can make here (wrong date, wrong amount, invented name, missing hearing, advice) is caught.</p>
+      <p>Hand <span class="mono">src/</span> and <span class="mono">tests/</span> to your developer, or never open them.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="pricing"><div class="wrap">
+  <h2 class="big">Fixed price, paid by milestone</h2>
+  <p class="sub">Each milestone has a test you can check yourself before you release it.</p>
+  <div class="tiers">
+    <div class="tierc">
+      <h3>Claude summary</h3>
+      <div class="price">$2,400</div>
+      <p class="for">One report type, a plain-English summary on your existing page.</p>
+      <ul>
+        <li>Connection to your internal data (read-only)</li>
+        <li>Structured Claude output with the schema checks</li>
+        <li>Every figure traced before display</li>
+        <li>Glossary of terms</li>
+      </ul>
+      <div class="ms"><span><b>Done when:</b> 20 of your real records produce reports that pass every check.</span></div>
+    </div>
+    <div class="tierc feat">
+      <span class="badge">BEST VALUE</span>
+      <h3>Full report integration</h3>
+      <div class="price">$4,000<s>worth $8,000+</s></div>
+      <p class="for">Your report, connected to Claude end to end, easy to understand and act on.</p>
+      <ul>
+        <li>Everything in Claude summary</li>
+        <li>What happens next with countdowns, and actions tied to entries</li>
+        <li>Reading-level target, end-user and staff versions</li>
+        <li>Fallback view when a check or the model fails, with logging</li>
+        <li>Cost and failure logging per report</li>
+        <li>QA on 100 of your real records, then documentation</li>
+        <li class="bonus">Walkthrough video of the whole setup</li>
+        <li class="bonus">Your first 20 records tuned with you, line by line</li>
+        <li class="bonus">30 days of fixes after go-live</li>
+      </ul>
+      <div class="ms">
+        <span><b>M1 $1,200:</b> data connected, schema and prompt agreed, 20 real records pass every check.</span>
+        <span><b>M2 $1,800:</b> live on your staging site, with the fallback view and logging.</span>
+        <span><b>M3 $1,000:</b> 100 records pass, documentation handed over.</span>
+      </div>
+    </div>
+    <div class="tierc">
+      <h3>Report platform</h3>
+      <div class="price">$6,800</div>
+      <p class="for">Several report types and the tools to run them yourself.</p>
+      <ul>
+        <li>Everything in Full report integration</li>
+        <li>Up to 4 report types (records, counties, accounts)</li>
+        <li>PDF export</li>
+        <li>Admin screen to edit wording rules and the glossary</li>
+        <li>Two months of monthly tuning from real usage</li>
+      </ul>
+      <div class="ms"><span><b>Paid in 4 milestones,</b> each with its own done-when test.</span></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="start"><div class="wrap">
+  <div class="cta">
+    <div>
+      <h2>Send me one real record. See your own report before we talk.</h2>
+      <p>Names changed is fine. I will load it into this studio so you see your data as your users would, with every figure traced.</p>
+      <p class="urg">I can start this week.</p>
+    </div>
+    <ul class="need">
+      <li><b>01</b>One or two sample records, as an export or a screenshot of the report today</li>
+      <li><b>02</b>Who reads the report, and what you want them to do next</li>
+      <li><b>03</b>Where the data lives (database, API, spreadsheet)</li>
+      <li><b>04</b>Your Anthropic account, or I set one up in your name</li>
+    </ul>
+  </div>
+  <div class="scope">
+    <h3>Honest scope</h3>
+    <ul>
+      <li>Built from your job post. The courts, cases, people and companies are invented. No real court or client data is shown.</li>
+      <li>In this demo a stand-in drafter on the page writes the JSON, so the page needs no API key and sends nothing anywhere. The Claude request shown is what your build sends; the checks are what it runs on every reply.</li>
+      <li>The engine and the passing tests are real: <span id="countLine">61 engine checks and 31 browser checks</span>.</li>
+      <li>The delivered version runs on your systems with access you provide during the build. No prior client build of this kind is claimed.</li>
+      <li>This link will be taken down about 30 days after it was sent.</li>
+    </ul>
+  </div>
+</div></section>
+</main>
+<footer>Built by Taiwo, Pathfinder Automation Solutions</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="src/caseReport.js"></script>
+<script>
+(function () {
+  'use strict';
+  var FALLBACK = {"_note":"Invented sample records for a live demo. The courts, people, companies and case numbers are invented. No real court data is used.","asOf":"2026-10-27","records":[{"id":"2026-SC-004417","type":"small-claims","court":"Harbor County Court, Small Claims Division","title":"Ortega v. Brightline Auto Repair LLC","subject":"a car repair dispute","filed":"2026-08-14","parties":[{"role":"Plaintiff","name":"Marisol Ortega"},{"role":"Defendant","name":"Brightline Auto Repair LLC"}],"claim":{"amount":4850},"docket":[{"id":"D1","date":"2026-08-14","code":"CMPL","text":"COMPLAINT FILED $4,850.00"},{"id":"D2","date":"2026-08-14","code":"FEE","text":"FILING FEE PAID $175.00"},{"id":"D3","date":"2026-08-21","code":"SUMS ISS","text":"SUMMONS ISSUED TO DEF"},{"id":"D4","date":"2026-09-02","code":"SRV RET","text":"RETURN OF SERVICE - PERSONAL - DEF SERVED 08/29/2026"},{"id":"D5","date":"2026-09-19","code":"ANS","text":"ANSWER FILED BY DEF"},{"id":"D6","date":"2026-09-30","code":"NTC HRG","text":"NOTICE OF PRETRIAL CONFERENCE SET 10/21/2026 09:00 CTRM 3B"},{"id":"D7","date":"2026-10-21","code":"PTC HELD","text":"PRETRIAL CONFERENCE HELD - MEDIATION ORDERED"},{"id":"D8","date":"2026-10-21","code":"ORD MED","text":"ORDER REFERRING TO MEDIATION - COMPLETE BY 11/20/2026"},{"id":"D9","date":"2026-10-22","code":"NTC TRL","text":"NOTICE OF TRIAL SET 12/08/2026 13:30 CTRM 3B"}]},{"id":"2026-CP-001208","type":"probate","court":"Harbor County Circuit Court, Probate Division","title":"In re: Estate of Harold J. Brennan","subject":"settling the estate of a person who died","filed":"2026-06-03","parties":[{"role":"Decedent","name":"Harold J. Brennan"},{"role":"Personal representative","name":"Linda Brennan Ruiz"},{"role":"Claimant","name":"Gulf Medical Billing"}],"docket":[{"id":"P1","date":"2026-06-03","code":"PET","text":"PETITION FOR ADMINISTRATION FILED"},{"id":"P2","date":"2026-06-03","code":"FEE","text":"FILING FEE PAID $400.00"},{"id":"P3","date":"2026-06-17","code":"LTRS ADM","text":"LETTERS OF ADMINISTRATION ISSUED TO LINDA BRENNAN RUIZ"},{"id":"P4","date":"2026-06-26","code":"NTC CRED","text":"NOTICE TO CREDITORS FIRST PUBLISHED 06/26/2026"},{"id":"P5","date":"2026-08-20","code":"INV","text":"INVENTORY FILED - TOTAL $412,300.00"},{"id":"P6","date":"2026-09-08","code":"CLM","text":"STATEMENT OF CLAIM FILED BY GULF MEDICAL BILLING $3,912.40"},{"id":"P7","date":"2026-09-15","code":"OBJ CLM X","text":"OBJ TO CLM FILED BY PR"},{"id":"P8","date":"2026-09-31","code":"NTC HRG","text":"HEARING ON OBJECTION TO CLAIM SET 11/05/2026 10:00 RM 210"}]}]};
+  var C = window.CaseReport;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var clone = function (x) { return JSON.parse(JSON.stringify(x)); };
+  var SAMPLE, S, view = 'report';
+
+  function toast(t) { var el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { el.classList.remove('on'); }, 2400); }
+  function fresh() { return { records: clone(SAMPLE.records), ix: 0, asOf: SAMPLE.asOf, audience: 'public', json: null, dirty: false }; }
+  function rec() { return S.records[S.ix]; }
+  function opts() { return { audience: S.audience }; }
+  function setK(k, v) { var el = $('.kpi[data-k=' + k + '] b'); if (el.textContent !== String(v)) { el.textContent = v; var p = el.parentNode; p.classList.remove('flash'); void p.offsetWidth; p.classList.add('flash'); } }
+
+  function compute() {
+    if (!S.dirty) S.json = JSON.stringify(C.draft(rec(), S.asOf, opts()), null, 2);
+    render();
+  }
+  function render() {
+    var r = rec(), f = C.facts(r, S.asOf), parsed = null, perr = '';
+    try { parsed = JSON.parse(S.json); } catch (e) { perr = 'Not valid JSON: ' + e.message; }
+    var v = parsed ? C.verify(parsed, r, S.asOf, opts()) : null;
+    var q = C.request(r, S.asOf, opts());
+    $('#caseName').textContent = r.title + ' · ' + r.id;
+    $('#recList').innerHTML = S.records.map(function (x, i) { return '<button type="button" role="tab" data-rec="' + i + '" aria-selected="' + (i === S.ix) + '">' + esc(x.type === 'probate' ? 'Probate estate' : 'Small claims') + '<span class="cnt">' + esc(x.id.slice(5)) + '</span></button>'; }).join('');
+    if (document.activeElement !== $('#asOf')) $('#asOf').value = S.asOf;
+    $('#aud').value = S.audience;
+    // docket editor
+    var probs = f.problems;
+    $('#dk').innerHTML = r.docket.map(function (e, i) {
+      if (!e) return '';
+      var badRow = probs.some(function (p) { return p.indexOf('entry ' + e.id + ':') === 0; });
+      return '<div class="dkr' + (badRow ? ' bad' : '') + '" data-id="' + esc(e.id) + '"><span class="id">' + esc(e.id) + '</span>' +
+        '<input class="d" value="' + esc(e.date) + '" data-f="date" data-i="' + i + '" aria-label="Date of ' + esc(e.id) + '">' +
+        '<input class="c" value="' + esc(e.code) + '" data-f="code" data-i="' + i + '" aria-label="Code of ' + esc(e.id) + '">' +
+        '<button class="x" type="button" data-del="' + i + '" aria-label="Remove ' + esc(e.id) + '">×</button>' +
+        '<input class="t" value="' + esc(e.text) + '" data-f="text" data-i="' + i + '" aria-label="Text of ' + esc(e.id) + '"></div>';
+    }).join('');
+    $('#probs').innerHTML = probs.map(function (p) { return '<div>' + esc(p) + '</div>'; }).join('');
+    // KPIs
+    setK('stage', f.stage);
+    setK('next', f.upcoming.length ? C.fmtDate(f.upcoming[0].date).replace(/^(\w{3})\w*/, '$1').replace(/, \d{4}$/, '') + ' · ' + f.upcoming[0].daysUntil + 'd' : 'none');
+    setK('traced', v ? v.traced + '/' + v.figures : '–');
+    setK('grade', v && v.grade !== null ? v.grade : '–');
+    var passed = v ? v.checks.filter(function (c) { return c.ok; }).length : 0;
+    setK('checks', v ? passed + '/' + v.checks.length : '0/8');
+    setK('cost', '$' + q.cost.toFixed(3));
+    $('#ckCount').textContent = v ? '(' + passed + '/' + v.checks.length + ')' : '(JSON error)';
+    $('#badges').innerHTML = v ? v.checks.map(function (c) { return '<span class="ck ' + (c.ok ? (c.warn ? 'warn' : 'ok') : 'bad') + '" data-check="' + c.id + '">' + (c.ok ? '✓ ' : '✕ ') + esc(c.label) + '</span>'; }).join('') : '<span class="ck bad">✕ Claude\'s output is not valid JSON</span>';
+    // report
+    if (!v) $('#report').innerHTML = '<div class="blocked"><b>Not shown to the user</b>' + esc(perr) + '. Your users would see the plain record view instead, and the failure is logged.</div>';
+    else if (!v.ok) $('#report').innerHTML = '<div class="blocked" id="blockedBox"><b>Not shown to the user: ' + v.issues.filter(function (i) { return i.severity === 'block'; }).length + ' check' + (v.issues.filter(function (i) { return i.severity === 'block'; }).length > 1 ? 's' : '') + ' failed</b>' +
+      v.issues.filter(function (i) { return i.severity === 'block'; }).slice(0, 4).map(function (i) { return '<div>• ' + esc(i.detail) + '</div>'; }).join('') + '<div style="margin-top:6px">Your users would see the plain record view instead, and the failure is logged for review.</div></div>';
+    else $('#report').innerHTML = C.renderHtml(parsed, r);
+    $('#jsonErr').textContent = perr;
+    if (document.activeElement !== $('#jsonTa')) $('#jsonTa').value = S.json;
+    // request
+    var b = q.body, code = 'import Anthropic from "@anthropic-ai/sdk";\n\nconst client = new Anthropic(); // key from your environment, never in the page\n\n' +
+      'const response = await client.beta.messages.create({\n  model: "' + b.model + '",\n  max_tokens: ' + b.max_tokens + ',\n  betas: ["server-side-fallback-2026-07-01"],\n  fallbacks: "default",\n' +
+      '  output_config: { effort: "low", format: { type: "json_schema", schema: REPORT_SCHEMA } },\n  system: SYSTEM_PROMPT,\n  messages: [{ role: "user", content: JSON.stringify(input) }],\n});\n\n' +
+      'if (response.stop_reason === "refusal") return showRecordView(record);   // plain view, logged\nconst report = JSON.parse(response.content.find((c) => c.type === "text").text);\nconst check = verify(report, record, asOf);   // the checks on this page\nreturn check.ok ? render(report) : showRecordView(record, check.issues);\n\n' +
+      '// SYSTEM_PROMPT\n' + b.system.split('\n').map(function (l) { return '//   ' + l; }).join('\n') + '\n\n// input (built from your data; facts are computed before Claude sees them)\n' + JSON.stringify(q.input, null, 2);
+    $('#code').textContent = code;
+    $('#costBox').innerHTML = '<div><b>~' + q.tokensIn.toLocaleString() + '</b><span>input tokens (estimate)</span></div><div><b>~' + q.tokensOut.toLocaleString() + '</b><span>output tokens (estimate)</span></div><div><b>$' + q.cost.toFixed(3) + '</b><span>per report at $4 / $20 per million (Claude Opus 5.5 list price)</span></div>';
+    // checks tab
+    $('#checkList').innerHTML = v ? v.checks.map(function (c) {
+      var is = v.issues.filter(function (i) { return i.check === c.id; });
+      return '<div class="card" style="margin-bottom:8px"><span class="ck ' + (c.ok ? (c.warn ? 'warn' : 'ok') : 'bad') + '">' + (c.ok ? '✓ ' : '✕ ') + esc(c.label) + '</span>' +
+        (is.length ? '<div class="ilist">' + is.map(function (i) { return '<div class="' + i.severity + '">' + esc(i.detail) + (i.field ? ' <span class="mono" style="opacity:.7">(' + esc(i.field) + ')</span>' : '') + '</div>'; }).join('') + '</div>' : '') + '</div>';
+    }).join('') + '<p class="hint">' + v.traced + ' of ' + v.figures + ' figures traced. Reading grade ' + v.grade + ' (target ' + (S.audience === 'staff' ? 14 : 8) + ').</p>' : '<div class="blocked">' + esc(perr) + '</div>';
+    $$('.tabsx [data-v]').forEach(function (t) { t.setAttribute('aria-selected', String(t.getAttribute('data-v') === view)); });
+    $$('[data-view]').forEach(function (p) { p.hidden = p.getAttribute('data-view') !== view; });
+  }
+
+  function bind() {
+    $('#recList').addEventListener('click', function (e) { var b = e.target.closest('[data-rec]'); if (!b) return; S.ix = +b.getAttribute('data-rec'); S.dirty = false; compute(); });
+    $('#asOf').addEventListener('change', function () {
+      var d = $('#asOf').value;
+      if (!C.validISO(d)) { $('#setErr').textContent = 'Pick a real date.'; return; }
+      $('#setErr').textContent = ''; S.asOf = d; S.dirty = false; compute();
+    });
+    $('#aud').addEventListener('change', function () { S.audience = $('#aud').value; S.dirty = false; compute(); });
+    $('#dk').addEventListener('change', function (e) {
+      var i = e.target.getAttribute('data-i'), fld = e.target.getAttribute('data-f'); if (i == null) return;
+      rec().docket[i][fld] = fld === 'code' ? e.target.value.toUpperCase() : e.target.value; S.dirty = false; compute();
+    });
+    $('#dk').addEventListener('click', function (e) { var i = e.target.getAttribute('data-del'); if (i == null) return; var id = rec().docket[i].id; rec().docket.splice(+i, 1); S.dirty = false; compute(); toast('Removed ' + id + ' from the record'); });
+    $('#addForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var d = $('#nDate').value, code = $('#nCode').value, text = $('#nText').value.trim();
+      if (!C.validISO(d)) return ($('#addErr').textContent = 'Pick the date of the entry.');
+      if (d > S.asOf) return ($('#addErr').textContent = 'That date is after the report date; a docket only lists what has happened.');
+      if (text.length < 6) return ($('#addErr').textContent = 'Type the entry text as the court wrote it.');
+      $('#addErr').textContent = '';
+      var ids = rec().docket.filter(Boolean).map(function (x) { return x.id; }), pre = rec().docket[0] ? rec().docket[0].id.replace(/\d+$/, '') : 'E', n = ids.length + 1;
+      while (ids.indexOf(pre + n) >= 0) n++;
+      rec().docket.push({ id: pre + n, date: d, code: code, text: text.toUpperCase() });
+      $('#nText').value = ''; S.dirty = false; compute(); toast('Added ' + pre + n + ' to the record');
+    });
+    $('#jsonTa').addEventListener('input', function () { S.json = $('#jsonTa').value; S.dirty = true; render(); });
+    $('#resetJson').addEventListener('click', function () { S.dirty = false; compute(); toast("Back to the model's output"); });
+    $$('.tabsx [data-v]').forEach(function (t) { t.addEventListener('click', function () { view = t.getAttribute('data-v'); render(); }); });
+    $('#resetBtn').addEventListener('click', function () { S = fresh(); view = 'report'; $('#addErr').textContent = ''; $('#setErr').textContent = ''; compute(); toast('Back to the starting records'); });
+    $('#dlHtml').addEventListener('click', function () {
+      var parsed; try { parsed = JSON.parse(S.json); } catch (e) { return toast('Fix the JSON first'); }
+      var v = C.verify(parsed, rec(), S.asOf, opts());
+      if (!v.ok) return toast('Not exported: ' + v.issues.filter(function (i) { return i.severity === 'block'; })[0].detail);
+      var css = Array.prototype.slice.call(document.styleSheets[0].cssRules).map(function (r) { return r.cssText; }).filter(function (t) { return /^\.(rep|pill|nx|nexts|acts|tl|gl|gls|cav)|^:root/.test(t); }).join('\n');
+      var html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>' + esc(rec().title) + '</title><style>body{font:16px/1.55 -apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f4f6f9;padding:24px;color:#17233b}' + css + '</style></head><body>' + C.renderHtml(parsed, rec()) + '</body></html>';
+      download(html, 'report-' + rec().id + '.html', 'text/html'); toast('Downloaded the report as it would appear');
+    });
+    $('#dlJson').addEventListener('click', function () { download(S.json, 'report-' + rec().id + '.json', 'application/json'); });
+  }
+  function download(text, name, mime) {
+    var url = URL.createObjectURL(new Blob([text], { type: mime })), a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1500);
+  }
+  function start(data) {
+    SAMPLE = data; S = fresh();
+    $('#nCode').innerHTML = Object.keys(C.DICT).map(function (k) { return '<option>' + k + '</option>'; }).join('');
+    $('#nDate').value = SAMPLE.asOf;
+    bind(); compute();
+  }
+  if (location.protocol === 'file:') start(FALLBACK);
+  else fetch('data/records.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(start).catch(function () { start(FALLBACK); });
+})();
+</script>
+</body>
+</html>

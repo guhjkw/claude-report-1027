@@ -1,0 +1,53 @@
+{
+  "_note": "Invented sample records for a live demo. The courts, people, companies and case numbers are invented. No real court data is used.",
+  "asOf": "2026-10-27",
+  "records": [
+    {
+      "id": "2026-SC-004417",
+      "type": "small-claims",
+      "court": "Harbor County Court, Small Claims Division",
+      "title": "Ortega v. Brightline Auto Repair LLC",
+      "subject": "a car repair dispute",
+      "filed": "2026-08-14",
+      "parties": [
+        { "role": "Plaintiff", "name": "Marisol Ortega" },
+        { "role": "Defendant", "name": "Brightline Auto Repair LLC" }
+      ],
+      "claim": { "amount": 4850 },
+      "docket": [
+        { "id": "D1", "date": "2026-08-14", "code": "CMPL", "text": "COMPLAINT FILED $4,850.00" },
+        { "id": "D2", "date": "2026-08-14", "code": "FEE", "text": "FILING FEE PAID $175.00" },
+        { "id": "D3", "date": "2026-08-21", "code": "SUMS ISS", "text": "SUMMONS ISSUED TO DEF" },
+        { "id": "D4", "date": "2026-09-02", "code": "SRV RET", "text": "RETURN OF SERVICE - PERSONAL - DEF SERVED 08/29/2026" },
+        { "id": "D5", "date": "2026-09-19", "code": "ANS", "text": "ANSWER FILED BY DEF" },
+        { "id": "D6", "date": "2026-09-30", "code": "NTC HRG", "text": "NOTICE OF PRETRIAL CONFERENCE SET 10/21/2026 09:00 CTRM 3B" },
+        { "id": "D7", "date": "2026-10-21", "code": "PTC HELD", "text": "PRETRIAL CONFERENCE HELD - MEDIATION ORDERED" },
+        { "id": "D8", "date": "2026-10-21", "code": "ORD MED", "text": "ORDER REFERRING TO MEDIATION - COMPLETE BY 11/20/2026" },
+        { "id": "D9", "date": "2026-10-22", "code": "NTC TRL", "text": "NOTICE OF TRIAL SET 12/08/2026 13:30 CTRM 3B" }
+      ]
+    },
+    {
+      "id": "2026-CP-001208",
+      "type": "probate",
+      "court": "Harbor County Circuit Court, Probate Division",
+      "title": "In re: Estate of Harold J. Brennan",
+      "subject": "settling the estate of a person who died",
+      "filed": "2026-06-03",
+      "parties": [
+        { "role": "Decedent", "name": "Harold J. Brennan" },
+        { "role": "Personal representative", "name": "Linda Brennan Ruiz" },
+        { "role": "Claimant", "name": "Gulf Medical Billing" }
+      ],
+      "docket": [
+        { "id": "P1", "date": "2026-06-03", "code": "PET", "text": "PETITION FOR ADMINISTRATION FILED" },
+        { "id": "P2", "date": "2026-06-03", "code": "FEE", "text": "FILING FEE PAID $400.00" },
+        { "id": "P3", "date": "2026-06-17", "code": "LTRS ADM", "text": "LETTERS OF ADMINISTRATION ISSUED TO LINDA BRENNAN RUIZ" },
+        { "id": "P4", "date": "2026-06-26", "code": "NTC CRED", "text": "NOTICE TO CREDITORS FIRST PUBLISHED 06/26/2026" },
+        { "id": "P5", "date": "2026-08-20", "code": "INV", "text": "INVENTORY FILED - TOTAL $412,300.00" },
+        { "id": "P6", "date": "2026-09-08", "code": "CLM", "text": "STATEMENT OF CLAIM FILED BY GULF MEDICAL BILLING $3,912.40" },
+        { "id": "P7", "date": "2026-09-15", "code": "OBJ CLM X", "text": "OBJ TO CLM FILED BY PR" },
+        { "id": "P8", "date": "2026-09-31", "code": "NTC HRG", "text": "HEARING ON OBJECTION TO CLAIM SET 11/05/2026 10:00 RM 210" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+
+1. Record checks: bad entries are left out and reported, never fatal
+  PASS an impossible date (September 31) is left out with a reason
+  PASS an unknown code is kept, shown as written, and reported
+  PASS an entry dated after the report date is left out
+  PASS an entry with no text is left out
+  PASS a duplicate id is renamed and reported
+  PASS a non-entry row is left out
+  PASS a report date that is not a real date is reported
+
+2. Facts from the record
+  PASS the small claims case is at Mediation, open 74 days
+  PASS two dates ahead: mediation deadline Nov 20 (24 days) and trial Dec 8 at 13:30 (42 days)
+  PASS the pretrial conference on Oct 21 is known and marked as past
+  PASS amounts come from the docket and the claim: $4,850 and $175
+  PASS the probate case is at Claims, open 146 days, with no dates ahead
+  PASS fixing the date brings back the hearing: Nov 5 at 10:00 in Room 210, 9 days away
+  PASS a later report date moves the countdown (Nov 21: mediation deadline passed, trial in 17 days)
+  PASS a continuance moves the trial: January 12, 2027 replaces December 8
+  PASS a report that still lists December 8 after the move is blocked
+  PASS the report drafted after the move passes
+
+3. The drafted report
+  PASS the summary names both sides and the amount
+  PASS it says what happens next in date order
+  PASS "What happens next" lists both dates with countdowns
+  PASS every action cites an entry: D8, D9, D5, then general help
+  PASS the timeline explains each entry in plain English
+  PASS the glossary explains every legal term used
+  PASS the caveats say it is not legal advice
+  PASS the staff version shows codes, calendars dates and has no glossary
+  PASS the probate report says there are no dates ahead and that 2 entries had problems
+  PASS the unknown code is not interpreted
+
+4. Clean drafts pass every check
+  PASS small claims: 31 of 31 figures traced, reading grade 6.5, no issues
+  PASS probate: 18 of 18 figures traced, no issues
+  PASS the staff version passes its own checks
+  PASS the drafts fit the exact schema the request sends
+
+5. The checks catch what a model (or a person) gets wrong
+  PASS a wrong date (December 9) is blocked
+  PASS a wrong amount ($5,000) is blocked
+  PASS a wrong time (2:30 PM) is blocked
+  PASS a name that is not in the record is blocked
+  PASS so is a title before an unknown surname
+  PASS "you will win" is blocked as legal advice
+  PASS caveats that drop "not legal advice" are blocked
+  PASS leaving out the trial date is blocked
+  PASS a wrong countdown (25 days for 24) is blocked
+  PASS a date that has passed listed as "next" is blocked
+  PASS an action pointing at an entry that does not exist is blocked
+  PASS a legal term with no glossary entry is blocked
+  PASS writing above grade 8 is blocked for the public
+  PASS the same text only warns on the staff version
+  PASS a reply missing fields is blocked on shape before anything else
+  PASS a reply that is not an object is blocked
+  PASS numeric dates are traced too (08/15/2026 is not in the record)
+  PASS a day count the record gives (74 days open) passes
+  PASS one it does not (80 days) is blocked
+
+6. The Claude request a delivered build sends
+  PASS model claude-opus-5-5 with server-side fallback on
+  PASS structured output: output_config.format is the report JSON schema, effort low
+  PASS no temperature or other removed sampling settings
+  PASS the system prompt carries the rules the checks enforce
+  PASS the input carries the docket, the derived dates and the record problems
+  PASS cost per report at list price is about 3 cents
+  PASS the staff request asks for grade 14
+
+7. The end-user page and the reading-level formula
+  PASS the report renders its sections with countdowns
+  PASS text is escaped, never run
+  PASS short plain sentences score low, dense ones high
+  PASS dates and money format the way people read them
+
+61 checks: 61 passed, 0 failed
